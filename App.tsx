@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { CountrySelector } from './components/CountrySelector';
 import { IncomeSelector } from './components/IncomeSelector';
 import { BudgetDashboard } from './components/BudgetDashboard';
 import { Country, IncomeRange, BudgetPlan, Language, AppStep } from './types';
 import { generateBudgetPlan } from './services/geminiService';
-import { Loader2, ArrowLeft, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { Loader2, ArrowLeft, AlertTriangle, RefreshCcw, Sparkles } from 'lucide-react';
 import { LANGUAGES, TRANSLATIONS } from './constants';
 
 const App: React.FC = () => {
@@ -16,11 +16,33 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Defaults
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Initialize Dark Mode from LocalStorage or System Preference
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme === 'dark';
+      }
+      return document.documentElement.classList.contains('dark') || 
+             window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+  
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(LANGUAGES[0]);
 
   const t = TRANSLATIONS[selectedLanguage.code] || TRANSLATIONS['en'];
+
+  // Apply Dark Mode to HTML Root and Save to LocalStorage
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
@@ -88,8 +110,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''} flex flex-col min-h-[100dvh]`}>
-      <div className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex flex-col">
+    <div className="flex flex-col min-h-screen transition-colors duration-300">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex flex-col">
         
         <Header 
           isDarkMode={isDarkMode} 
@@ -100,16 +122,16 @@ const App: React.FC = () => {
           onLogoClick={handleReset}
         />
 
-        <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12">
+        <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           
           {/* Back Button */}
           {step !== AppStep.SELECT_COUNTRY && !isLoading && (
-            <div className="mb-6 sm:mb-8 animate-fade-in">
+            <div className="mb-8 animate-fade-in">
               <button 
                 onClick={handleBack}
-                className="group inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
+                className="group inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
               >
-                <div className="p-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 group-hover:border-blue-200 dark:group-hover:border-blue-800 transition-colors">
+                <div className="p-2 rounded-full bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-900/5 group-hover:ring-slate-900/10 transition-all">
                   <ArrowLeft className="h-4 w-4" />
                 </div>
                 {t.back}
@@ -120,15 +142,16 @@ const App: React.FC = () => {
           {/* Step 1: Country Selection */}
           {step === AppStep.SELECT_COUNTRY && (
             <section className="animate-fade-in flex flex-col items-center w-full">
-              {/* Modern Hero Section */}
-              <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 space-y-3 sm:space-y-4 px-2">
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-                  {/* Gradient Text effect */}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-                    {t.selectRegion}
-                  </span>
+              {/* Hero Section */}
+              <div className="text-center max-w-2xl mx-auto mb-12 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wide mb-2">
+                  <Sparkles className="h-3 w-3" />
+                  AI-Powered Advisor
+                </div>
+                <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.1]">
+                  {t.selectRegion}
                 </h2>
-                <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
+                <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                   {t.regionDesc}
                 </p>
               </div>
@@ -151,13 +174,13 @@ const App: React.FC = () => {
 
           {/* Loading State */}
           {isLoading && (
-            <div className="min-h-[50vh] flex flex-col items-center justify-center animate-fade-in py-12">
-               <div className="relative px-4 w-full flex justify-center">
-                 {/* Pulsing circles behind */}
-                 <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full animate-pulse max-w-md mx-auto"></div>
+            <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
+               <div className="relative mb-8">
+                 {/* Abstract Background */}
+                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
                  
-                 <div className="relative bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 text-center max-w-xs w-full">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 relative rounded-full overflow-hidden shadow-lg ring-4 ring-slate-50 dark:ring-slate-800 bg-slate-100">
+                 <div className="relative bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-2xl ring-1 ring-slate-900/5 dark:ring-white/10 text-center max-w-xs w-full aspect-square flex flex-col items-center justify-center">
+                    <div className="w-24 h-24 mb-6 relative rounded-full overflow-hidden shadow-lg ring-4 ring-slate-50 dark:ring-slate-800 bg-slate-100">
                       <img 
                          src={`https://flagcdn.com/w160/${selectedCountry?.code.toLowerCase()}.png`} 
                          alt="Flag"
@@ -167,31 +190,38 @@ const App: React.FC = () => {
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
                       {t.loading}
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-medium">
-                      {t.loadingDesc} {selectedCountry?.name}
+                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                      {selectedCountry?.name}
                     </p>
-                    <div className="flex justify-center">
-                      <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                 </div>
+                 
+                 <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
+                    <div className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-lg ring-1 ring-slate-900/5">
+                       <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
                     </div>
                  </div>
                </div>
+               
+               <p className="text-slate-500 dark:text-slate-400 font-medium animate-pulse">
+                 {t.loadingDesc}
+               </p>
             </div>
           )}
 
           {/* Error State */}
           {error && !isLoading && (
-            <div className="flex items-center justify-center min-h-[40vh] animate-fade-in px-4">
-              <div className="max-w-md w-full text-center bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-xl border border-red-100 dark:border-red-900/30">
-                <div className="bg-red-50 dark:bg-red-900/20 h-14 w-14 sm:h-16 sm:w-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 dark:text-red-400" />
+            <div className="flex items-center justify-center py-20 animate-fade-in">
+              <div className="max-w-md w-full text-center bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl ring-1 ring-slate-900/5 dark:ring-white/10">
+                <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
+                  <AlertTriangle className="h-8 w-8" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-3">{t.errorTitle}</h3>
-                <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed text-sm sm:text-base">{error}</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.errorTitle}</h3>
+                <p className="text-slate-500 dark:text-slate-400 mb-8">{error}</p>
                 <button 
                   onClick={() => selectedIncomeRange && handleIncomeSelect(selectedIncomeRange)}
-                  className="w-full py-3.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all transform hover:scale-[1.02] shadow-lg shadow-red-600/20 flex items-center justify-center gap-2 text-sm sm:text-base"
+                  className="w-full py-3 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 >
-                  <RefreshCcw className="h-5 w-5" />
+                  <RefreshCcw className="h-4 w-4" />
                   {t.tryAgain}
                 </button>
               </div>

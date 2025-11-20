@@ -22,54 +22,59 @@ export const IncomeSelector: React.FC<IncomeSelectorProps> = ({ country, onSelec
   })();
 
   return (
-    <div className="w-full max-w-2xl mx-auto animate-slide-up px-2 sm:px-0">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-        <div className="p-6 sm:p-8 text-center border-b border-slate-100 dark:border-slate-800">
-           <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-full shadow-md overflow-hidden border-4 border-slate-50 dark:border-slate-800">
+    <div className="w-full max-w-xl mx-auto animate-slide-up">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl ring-1 ring-slate-900/5 dark:ring-white/10 overflow-hidden">
+        {/* Header */}
+        <div className="p-8 text-center border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
+           <div className="w-16 h-16 mx-auto mb-4 rounded-full shadow-md overflow-hidden border-4 border-white dark:border-slate-800">
              <img 
                 src={`https://flagcdn.com/w160/${country.code.toLowerCase()}.png`} 
                 alt={country.name} 
                 className="w-full h-full object-cover"
               />
            </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
             {t.incomeTitle} {countryName}
           </h2>
-          <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
-            {t.incomeDesc} <strong>{country.currencyCode}</strong>
+          <p className="text-slate-500 dark:text-slate-400">
+            {t.incomeDesc} <span className="font-bold text-slate-700 dark:text-slate-200">{country.currencyCode}</span>
           </p>
         </div>
         
-        <div className="p-3 sm:p-4 space-y-2 bg-slate-50 dark:bg-slate-950/50">
+        {/* List */}
+        <div className="p-4 space-y-2">
           {ranges.map((range, index) => (
             <button
               key={index}
               onClick={() => onSelect(range)}
               className="
-                w-full flex items-center justify-between p-4 sm:p-5 
+                w-full flex items-center justify-between p-4 rounded-xl
                 bg-white dark:bg-slate-900 
                 border border-slate-200 dark:border-slate-800 
-                rounded-xl
                 hover:border-blue-500 dark:hover:border-blue-500 
+                hover:bg-blue-50/50 dark:hover:bg-blue-900/10
                 hover:shadow-md hover:-translate-y-0.5
                 transition-all duration-200 group
-                active:bg-slate-50 dark:active:bg-slate-800
               "
             >
-              <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-4">
                 <div className={`
-                  w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0
+                  w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors
                   ${range.min === 0 
-                    ? 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500' 
-                    : 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'}
+                    ? 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 group-hover:bg-white dark:group-hover:bg-slate-700' 
+                    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50'}
                 `}>
-                  <Banknote className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <Banknote className="h-5 w-5" />
                 </div>
-                <span className={`text-base sm:text-lg font-bold text-left ${range.min === 0 ? 'text-slate-500' : 'text-slate-800 dark:text-slate-200'}`}>
-                  {range.label}
-                </span>
+                <div className="flex flex-col items-start">
+                  <span className={`text-lg font-bold ${range.min === 0 ? 'text-slate-500 dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}>
+                    {range.label}
+                  </span>
+                </div>
               </div>
-              <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-blue-500 transition-colors shrink-0 ml-2" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-600 group-hover:text-blue-500 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
+                <ChevronRight className="h-5 w-5" />
+              </div>
             </button>
           ))}
         </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BudgetPlan, Country } from '../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Lightbulb, Target, TrendingUp, Quote, Trophy, ArrowRight } from 'lucide-react';
+import { Lightbulb, TrendingUp, Quote, Trophy, Target } from 'lucide-react';
 import { TRANSLATIONS } from '../constants';
 
 interface BudgetDashboardProps {
@@ -23,140 +23,134 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ plan, country,
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in w-full">
+    <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
       
       {/* 1. Hero Summary Card */}
-      <div className="relative overflow-hidden bg-slate-900 dark:bg-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-2xl">
-        <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-8 items-start justify-between">
-          <div className="space-y-4 max-w-2xl w-full">
-            <div className="flex items-center gap-2 text-indigo-200 font-medium text-xs sm:text-sm uppercase tracking-wider">
-              <span className="bg-white/10 px-2 py-1 rounded">{t.monthlyBlueprint}</span>
-              <span>•</span>
-              <span>{plan.currency}</span>
+      <div className="bg-slate-900 dark:bg-white rounded-[2rem] p-6 sm:p-10 shadow-2xl text-white dark:text-slate-900 relative overflow-hidden">
+        {/* Decorative blob */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 dark:bg-blue-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row gap-8 justify-between">
+          <div className="space-y-6 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 dark:bg-slate-100 border border-white/10 dark:border-slate-200 backdrop-blur-md">
+              <span className="text-xs font-bold uppercase tracking-wider opacity-90">{t.monthlyBlueprint}</span>
+              <span className="w-1 h-1 rounded-full bg-white dark:bg-slate-900 opacity-50"></span>
+              <span className="text-xs font-bold uppercase tracking-wider opacity-90">{plan.currency}</span>
             </div>
-            <p className="text-lg sm:text-xl leading-relaxed text-indigo-50 font-light">
+            
+            <p className="text-xl sm:text-2xl leading-relaxed font-medium text-slate-100 dark:text-slate-800">
               {plan.summary}
             </p>
             
-            {/* Quote Block */}
             {plan.quote && (
-               <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10 flex gap-3">
-                  <Quote className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-400 shrink-0 mt-1" />
-                  <p className="italic text-indigo-200 text-sm sm:text-base">"{plan.quote}"</p>
-               </div>
+              <div className="flex gap-4 items-start pt-4 border-t border-white/10 dark:border-slate-200">
+                <Quote className="h-6 w-6 text-blue-400 shrink-0" />
+                <p className="text-slate-300 dark:text-slate-600 italic font-serif text-lg">"{plan.quote}"</p>
+              </div>
             )}
           </div>
 
-          <div className="hidden md:block shrink-0">
-             <div className="w-20 h-14 sm:w-24 sm:h-16 rounded-lg overflow-hidden shadow-lg border-2 border-white/20 rotate-3">
+          <div className="hidden md:block">
+             <div className="w-24 h-24 bg-white/10 dark:bg-slate-100 backdrop-blur-sm rounded-2xl p-2 shadow-inner rotate-3">
                <img 
                   src={`https://flagcdn.com/w160/${country.code.toLowerCase()}.png`} 
                   alt={country.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-xl shadow-sm"
                 />
              </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Life Goal & Strategy Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        
+      {/* 2. Goals Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Life Goal */}
-        <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 p-5 sm:p-6 rounded-3xl flex items-start gap-4">
-           <div className="bg-emerald-100 dark:bg-emerald-900 p-2.5 sm:p-3 rounded-xl text-emerald-700 dark:text-emerald-400 shrink-0">
-             <Trophy className="h-5 w-5 sm:h-6 sm:w-6" />
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full">
+           <div className="flex items-center gap-3 mb-4">
+             <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl">
+               <Trophy className="h-6 w-6" />
+             </div>
+             <h3 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-sm">{t.lifeGoal}</h3>
            </div>
-           <div>
-             <h4 className="text-xs sm:text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wide mb-1">{t.lifeGoal}</h4>
-             <p className="text-base sm:text-lg font-semibold text-emerald-950 dark:text-emerald-100 leading-tight">{plan.lifeGoal}</p>
-           </div>
+           <p className="text-lg font-medium text-slate-800 dark:text-slate-200 mt-auto">
+             {plan.lifeGoal}
+           </p>
         </div>
 
-        {/* Investment Focus */}
-        <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 p-5 sm:p-6 rounded-3xl flex items-start gap-4">
-           <div className="bg-indigo-100 dark:bg-indigo-900 p-2.5 sm:p-3 rounded-xl text-indigo-700 dark:text-indigo-400 shrink-0">
-             <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
+        {/* Investment */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full">
+           <div className="flex items-center gap-3 mb-4">
+             <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl">
+               <TrendingUp className="h-6 w-6" />
+             </div>
+             <h3 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-sm">{t.investmentFocus}</h3>
            </div>
-           <div>
-             <h4 className="text-xs sm:text-sm font-bold text-indigo-800 dark:text-indigo-400 uppercase tracking-wide mb-1">{t.investmentFocus}</h4>
-             <p className="text-sm sm:text-base font-medium text-indigo-950 dark:text-indigo-100 leading-relaxed">{plan.investmentAdvice}</p>
-           </div>
+           <p className="text-base text-slate-600 dark:text-slate-400 mt-auto leading-relaxed">
+             {plan.investmentAdvice}
+           </p>
         </div>
       </div>
 
-      {/* 3. Chart & Allocation Section */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-             <Target className="h-5 w-5 text-blue-500" />
-             {t.idealAllocation}
-          </h3>
-        </div>
-        
-        <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
-           {/* Chart */}
-           <div className="h-[280px] sm:h-[320px] w-full">
-             <ResponsiveContainer width="100%" height="100%">
-               <PieChart>
-                 <Pie
-                   data={plan.breakdown}
-                   cx="50%"
-                   cy="50%"
-                   innerRadius={60}
-                   outerRadius={90}
-                   paddingAngle={5}
-                   dataKey="amount"
-                 >
-                   {plan.breakdown.map((entry, index) => (
-                     <Cell key={`cell-${index}`} fill={entry.color || '#cbd5e1'} stroke="none" />
-                   ))}
-                 </Pie>
-                 <Tooltip 
-                   formatter={(value: number) => formatCurrency(value)}
-                   contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px' }}
-                 />
-                 <Legend 
-                    verticalAlign="bottom" 
-                    height={36}
-                    iconType="circle"
-                    wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
-                  />
-               </PieChart>
-             </ResponsiveContainer>
+      {/* 3. Allocation Chart */}
+      <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row">
+        <div className="p-6 md:p-8 md:w-2/5 border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 flex flex-col justify-center bg-slate-50/50 dark:bg-slate-950/30">
+           <div className="flex items-center gap-3 mb-6">
+             <Target className="h-6 w-6 text-blue-600" />
+             <h3 className="font-bold text-xl text-slate-900 dark:text-white">{t.idealAllocation}</h3>
            </div>
-
-           {/* Legend List */}
-           <div className="space-y-2 sm:space-y-3">
+           <div className="space-y-3">
              {plan.breakdown.map((item) => (
-               <div key={item.name} className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-700 text-sm sm:text-base">
+               <div key={item.name} className="flex items-center justify-between text-sm">
                  <div className="flex items-center gap-3">
-                   <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                   <span className="font-medium text-slate-700 dark:text-slate-300 truncate">{item.name}</span>
+                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></span>
+                   <span className="text-slate-600 dark:text-slate-400 font-medium">{item.name}</span>
                  </div>
-                 <div className="text-right ml-2">
-                   <span className="block font-bold text-slate-900 dark:text-white whitespace-nowrap">{item.percentage}%</span>
-                   <span className="block text-xs text-slate-400">{formatCurrency(item.amount)}</span>
-                 </div>
+                 <span className="font-bold text-slate-900 dark:text-white">{item.percentage}%</span>
                </div>
              ))}
            </div>
         </div>
+
+        <div className="p-6 md:w-3/5 h-[350px] flex items-center justify-center bg-white dark:bg-slate-900">
+           <ResponsiveContainer width="100%" height="100%">
+             <PieChart>
+               <Pie
+                 data={plan.breakdown as any[]}
+                 cx="50%"
+                 cy="50%"
+                 innerRadius={80}
+                 outerRadius={110}
+                 paddingAngle={4}
+                 dataKey="amount"
+                 cornerRadius={6}
+               >
+                 {plan.breakdown.map((entry, index) => (
+                   <Cell key={`cell-${index}`} fill={entry.color || '#cbd5e1'} strokeWidth={0} />
+                 ))}
+               </Pie>
+               <Tooltip 
+                 formatter={(value: number) => [formatCurrency(value), 'Amount']}
+                 contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px', color: '#fff', padding: '12px' }}
+                 itemStyle={{ color: '#fff' }}
+               />
+             </PieChart>
+           </ResponsiveContainer>
+        </div>
       </div>
 
-      {/* 4. Actionable Steps */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-800 p-5 sm:p-6 md:p-8">
-        <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-5 sm:mb-6 flex items-center gap-2">
-           <Lightbulb className="h-5 w-5 text-amber-500" />
-           {t.smartMoves}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* 4. Actionable Tips */}
+      <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
+        <div className="flex items-center gap-3 mb-6">
+           <Lightbulb className="h-6 w-6 text-amber-500" />
+           <h3 className="font-bold text-xl text-slate-900 dark:text-white">{t.smartMoves}</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {plan.actionableTips.map((tip, idx) => (
-             <div key={idx} className="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                <div className="shrink-0 w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 font-bold text-sm shadow-sm border border-slate-100 dark:border-slate-600">
+             <div key={idx} className="flex gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors">
+                <div className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 font-bold text-sm shadow-sm ring-1 ring-slate-100 dark:ring-slate-600">
                   {idx + 1}
                 </div>
-                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
                   {tip}
                 </p>
              </div>
@@ -164,10 +158,10 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ plan, country,
         </div>
       </div>
 
-      <div className="flex justify-center pt-4 sm:pt-8 pb-8">
+      <div className="flex justify-center pt-8 pb-4">
          <button 
            onClick={onReset}
-           className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:scale-105 transition-transform shadow-xl active:scale-95"
+           className="px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-slate-900/20 dark:shadow-none active:scale-95"
          >
            {t.startOver}
          </button>
