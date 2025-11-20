@@ -5,7 +5,7 @@ import { IncomeSelector } from './components/IncomeSelector';
 import { BudgetDashboard } from './components/BudgetDashboard';
 import { Country, IncomeRange, BudgetPlan, Language, AppStep } from './types';
 import { generateBudgetPlan } from './services/geminiService';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, AlertTriangle, RefreshCcw } from 'lucide-react';
 import { LANGUAGES, TRANSLATIONS } from './constants';
 
 const App: React.FC = () => {
@@ -20,12 +20,9 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(LANGUAGES[0]);
 
-  // Get current translations
   const t = TRANSLATIONS[selectedLanguage.code] || TRANSLATIONS['en'];
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   const handleCountrySelect = (country: Country) => {
     setSelectedCountry(country);
@@ -41,6 +38,7 @@ const App: React.FC = () => {
     setIsLoading(true);
     setError(null);
     setStep(AppStep.VIEW_DASHBOARD);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     try {
       const plan = await generateBudgetPlan(selectedCountry, range, selectedLanguage);
@@ -48,25 +46,21 @@ const App: React.FC = () => {
     } catch (err) {
       console.error(err);
       setError(t.errorTitle);
-      setStep(AppStep.SELECT_INCOME); // Go back to income select on error
+      setStep(AppStep.SELECT_INCOME);
     } finally {
       setIsLoading(false);
     }
   }, [selectedCountry, selectedLanguage, t]);
 
-  // Dynamic Language Switching
   const handleLanguageChange = async (newLang: Language) => {
     setSelectedLanguage(newLang);
-    
-    // If we are already viewing a dashboard, regenerate it in the new language immediately
     if (step === AppStep.VIEW_DASHBOARD && selectedCountry && selectedIncomeRange && !isLoading) {
       setIsLoading(true);
       try {
-        // Pass newLang explicitly to ensure we use the updated language for the API call
         const plan = await generateBudgetPlan(selectedCountry, selectedIncomeRange, newLang);
         setBudgetPlan(plan);
       } catch (err) {
-        console.error("Failed to update language for dashboard", err);
+        console.error("Language update failed", err);
       } finally {
         setIsLoading(false);
       }
@@ -94,8 +88,15 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''} flex flex-col min-h-screen`}>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex flex-col">
+    <div className={`${isDarkMode ? 'dark' : ''} min-h-screen flex flex-col`}>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex flex-col relative overflow-x-hidden">
+        
+        {/* Modern Background Patterns */}
+        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/5 dark:bg-blue-600/10 blur-[100px]" />
+           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/5 dark:bg-purple-600/10 blur-[100px]" />
+        </div>
+
         <Header 
           isDarkMode={isDarkMode} 
           toggleTheme={toggleTheme}
@@ -105,26 +106,29 @@ const App: React.FC = () => {
           onLogoClick={handleReset}
         />
 
-        <main className="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
           
-          {/* Navigation Controls */}
+          {/* Navigation & Breadcrumbs */}
           {step !== AppStep.SELECT_COUNTRY && !isLoading && (
-            <button 
-              onClick={handleBack}
-              className="mb-6 inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-            >
-              <ArrowLeft className="h-4 w-4" /> {t.back}
-            </button>
+            <div className="mb-6 animate-fade-in">
+              <button 
+                onClick={handleBack}
+                className="group flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-sm ring-1 ring-slate-200 dark:ring-slate-800"
+              >
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" /> 
+                {t.back}
+              </button>
+            </div>
           )}
 
           {/* Step 1: Country Selection */}
           {step === AppStep.SELECT_COUNTRY && (
-            <section className="space-y-8 animate-fade-in">
-              <div className="text-center max-w-2xl mx-auto">
-                <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
+            <section className="space-y-8 animate-slide-up">
+              <div className="text-center space-y-4 py-8">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                   {t.selectRegion}
                 </h2>
-                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+                <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
                   {t.regionDesc}
                 </p>
               </div>
@@ -147,44 +151,44 @@ const App: React.FC = () => {
 
           {/* Loading State */}
           {isLoading && (
-            <div className="flex flex-col items-center justify-center py-20 sm:py-32 animate-fade-in">
-              <div className="relative mb-10 group">
-                <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-500 animate-pulse"></div>
-                <div className="relative z-10 bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800">
-                  <div className="relative h-32 w-48 overflow-hidden rounded-xl">
-                    <img 
-                      src={`https://flagcdn.com/w320/${selectedCountry?.code.toLowerCase()}.png`} 
-                      alt="Loading..."
-                      className="w-full h-full object-cover animate-pulse"
-                    />
-                  </div>
-                </div>
-                <div className="absolute -bottom-3 -right-3 bg-blue-600 text-white p-2 rounded-full shadow-lg border-4 border-slate-50 dark:border-slate-950 z-20">
-                  <Loader2 className="h-6 w-6 animate-spin" />
+            <div className="min-h-[60vh] flex flex-col items-center justify-center animate-fade-in">
+              <div className="relative">
+                <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 animate-pulse rounded-full"></div>
+                <div className="relative bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-6 max-w-sm mx-auto text-center">
+                   <div className="relative h-20 w-32 overflow-hidden rounded-xl shadow-md">
+                     <img 
+                        src={`https://flagcdn.com/w160/${selectedCountry?.code.toLowerCase()}.png`} 
+                        alt="Country Flag"
+                        className="w-full h-full object-cover"
+                      />
+                   </div>
+                   <div className="space-y-2">
+                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{t.loading}</h3>
+                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{t.loadingDesc} {selectedCountry?.name}</p>
+                   </div>
+                   <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
                 </div>
               </div>
-              
-              <h3 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight mb-2">{t.loading}</h3>
-              <p className="text-slate-500 dark:text-slate-400 font-medium">
-                {t.loadingDesc} <span className="text-blue-600 dark:text-blue-400">{selectedCountry?.name}</span>
-              </p>
             </div>
           )}
 
           {/* Error State */}
           {error && !isLoading && (
-            <div className="max-w-md mx-auto text-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-red-100 dark:border-red-900/30 mt-12 animate-fade-in">
-              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                <span className="text-3xl">⚠️</span>
+            <div className="flex items-center justify-center min-h-[50vh] animate-fade-in">
+              <div className="max-w-md w-full text-center bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-red-100 dark:border-red-900/30">
+                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full w-fit mx-auto mb-6">
+                  <AlertTriangle className="h-10 w-10 text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.errorTitle}</h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">{error}</p>
+                <button 
+                  onClick={() => selectedIncomeRange && handleIncomeSelect(selectedIncomeRange)}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-red-600/20 active:scale-95 w-full"
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                  {t.tryAgain}
+                </button>
               </div>
-              <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-3">{t.errorTitle}</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">{error}</p>
-              <button 
-                onClick={() => selectedIncomeRange && handleIncomeSelect(selectedIncomeRange)}
-                className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-red-600/20"
-              >
-                {t.tryAgain}
-              </button>
             </div>
           )}
 
