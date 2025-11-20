@@ -1,0 +1,5 @@
+{
+  "name": "GlobalWealth Advisor",
+  "description": "A personalized budget planning application that adapts to your country and income level using AI to provide tailored financial advice and visualizations.",
+  "requestFramePermissions": []
+}
