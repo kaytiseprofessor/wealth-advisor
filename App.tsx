@@ -67,7 +67,6 @@ const App: React.FC = () => {
         setBudgetPlan(plan);
       } catch (err) {
         console.error("Failed to update language for dashboard", err);
-        // We don't change step here, just log error, maybe show a toast in future
       } finally {
         setIsLoading(false);
       }
@@ -95,8 +94,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''} min-h-screen flex flex-col`}>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+    <div className={`${isDarkMode ? 'dark' : ''} flex flex-col min-h-screen`}>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex flex-col">
         <Header 
           isDarkMode={isDarkMode} 
           toggleTheme={toggleTheme}
@@ -106,33 +105,33 @@ const App: React.FC = () => {
           onLogoClick={handleReset}
         />
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
           
           {/* Navigation Controls */}
           {step !== AppStep.SELECT_COUNTRY && !isLoading && (
             <button 
               onClick={handleBack}
-              className="mb-6 flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+              className="mb-6 inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <ArrowLeft className="h-5 w-5" /> {t.back}
+              <ArrowLeft className="h-4 w-4" /> {t.back}
             </button>
           )}
 
           {/* Step 1: Country Selection */}
           {step === AppStep.SELECT_COUNTRY && (
-            <section className="space-y-6">
-              <div className="text-center max-w-2xl mx-auto mb-6">
-                <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
+            <section className="space-y-8 animate-fade-in">
+              <div className="text-center max-w-2xl mx-auto">
+                <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
                   {t.selectRegion}
                 </h2>
-                <p className="text-lg text-slate-600 dark:text-slate-400">
+                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
                   {t.regionDesc}
                 </p>
               </div>
 
               <CountrySelector 
                 onSelect={handleCountrySelect} 
-                language={selectedLanguage.code} // Pass language code for dynamic country name translation
+                language={selectedLanguage.code} 
               />
             </section>
           )}
@@ -142,45 +141,47 @@ const App: React.FC = () => {
              <IncomeSelector 
                country={selectedCountry}
                onSelect={handleIncomeSelect}
-               language={selectedLanguage.code} // Pass language code for text translation
+               language={selectedLanguage.code} 
              />
           )}
 
           {/* Loading State */}
           {isLoading && (
-            <div className="flex flex-col items-center justify-center py-32 animate-fade-in">
-              <div className="relative mb-8">
-                <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
-                <div className="relative z-10 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 h-32 w-48 flex items-center justify-center overflow-hidden">
-                  <img 
-                    src={`https://flagcdn.com/w320/${selectedCountry?.code.toLowerCase()}.png`} 
-                    alt="Loading..."
-                    className="w-full h-full object-cover animate-pulse"
-                  />
+            <div className="flex flex-col items-center justify-center py-20 sm:py-32 animate-fade-in">
+              <div className="relative mb-10 group">
+                <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-500 animate-pulse"></div>
+                <div className="relative z-10 bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800">
+                  <div className="relative h-32 w-48 overflow-hidden rounded-xl">
+                    <img 
+                      src={`https://flagcdn.com/w320/${selectedCountry?.code.toLowerCase()}.png`} 
+                      alt="Loading..."
+                      className="w-full h-full object-cover animate-pulse"
+                    />
+                  </div>
                 </div>
-                <div className="absolute -bottom-2 -right-2 bg-blue-600 rounded-full p-1.5 border-4 border-slate-50 dark:border-slate-950 shadow-sm z-20">
-                  <Loader2 className="h-5 w-5 text-white animate-spin" />
+                <div className="absolute -bottom-3 -right-3 bg-blue-600 text-white p-2 rounded-full shadow-lg border-4 border-slate-50 dark:border-slate-950 z-20">
+                  <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">{t.loading}</h3>
-              <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">
-                {t.loadingDesc} {selectedCountry?.name}
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight mb-2">{t.loading}</h3>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">
+                {t.loadingDesc} <span className="text-blue-600 dark:text-blue-400">{selectedCountry?.name}</span>
               </p>
             </div>
           )}
 
           {/* Error State */}
           {error && !isLoading && (
-            <div className="max-w-md mx-auto text-center bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-red-100 dark:border-red-900/30 mt-12">
-              <div className="bg-red-100 dark:bg-red-900/20 p-3 rounded-full w-fit mx-auto mb-4">
-                <span className="text-2xl">⚠️</span>
+            <div className="max-w-md mx-auto text-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-red-100 dark:border-red-900/30 mt-12 animate-fade-in">
+              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                <span className="text-3xl">⚠️</span>
               </div>
-              <h3 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2">{t.errorTitle}</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
+              <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-3">{t.errorTitle}</h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">{error}</p>
               <button 
                 onClick={() => selectedIncomeRange && handleIncomeSelect(selectedIncomeRange)}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-red-600/20"
               >
                 {t.tryAgain}
               </button>
