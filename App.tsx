@@ -88,15 +88,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''} min-h-screen flex flex-col`}>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex flex-col relative overflow-x-hidden">
+    <div className={`${isDarkMode ? 'dark' : ''} flex flex-col min-h-[100dvh]`}>
+      <div className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex flex-col">
         
-        {/* Modern Background Patterns */}
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/5 dark:bg-blue-600/10 blur-[100px]" />
-           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/5 dark:bg-purple-600/10 blur-[100px]" />
-        </div>
-
         <Header 
           isDarkMode={isDarkMode} 
           toggleTheme={toggleTheme}
@@ -106,16 +100,18 @@ const App: React.FC = () => {
           onLogoClick={handleReset}
         />
 
-        <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+        <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12">
           
-          {/* Navigation & Breadcrumbs */}
+          {/* Back Button */}
           {step !== AppStep.SELECT_COUNTRY && !isLoading && (
-            <div className="mb-6 animate-fade-in">
+            <div className="mb-6 sm:mb-8 animate-fade-in">
               <button 
                 onClick={handleBack}
-                className="group flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-sm ring-1 ring-slate-200 dark:ring-slate-800"
+                className="group inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
               >
-                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" /> 
+                <div className="p-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 group-hover:border-blue-200 dark:group-hover:border-blue-800 transition-colors">
+                  <ArrowLeft className="h-4 w-4" />
+                </div>
                 {t.back}
               </button>
             </div>
@@ -123,12 +119,16 @@ const App: React.FC = () => {
 
           {/* Step 1: Country Selection */}
           {step === AppStep.SELECT_COUNTRY && (
-            <section className="space-y-8 animate-slide-up">
-              <div className="text-center space-y-4 py-8">
-                <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                  {t.selectRegion}
+            <section className="animate-fade-in flex flex-col items-center w-full">
+              {/* Modern Hero Section */}
+              <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 space-y-3 sm:space-y-4 px-2">
+                <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+                  {/* Gradient Text effect */}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+                    {t.selectRegion}
+                  </span>
                 </h2>
-                <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
                   {t.regionDesc}
                 </p>
               </div>
@@ -151,41 +151,47 @@ const App: React.FC = () => {
 
           {/* Loading State */}
           {isLoading && (
-            <div className="min-h-[60vh] flex flex-col items-center justify-center animate-fade-in">
-              <div className="relative">
-                <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 animate-pulse rounded-full"></div>
-                <div className="relative bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-6 max-w-sm mx-auto text-center">
-                   <div className="relative h-20 w-32 overflow-hidden rounded-xl shadow-md">
-                     <img 
-                        src={`https://flagcdn.com/w160/${selectedCountry?.code.toLowerCase()}.png`} 
-                        alt="Country Flag"
-                        className="w-full h-full object-cover"
-                      />
-                   </div>
-                   <div className="space-y-2">
-                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{t.loading}</h3>
-                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{t.loadingDesc} {selectedCountry?.name}</p>
-                   </div>
-                   <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-                </div>
-              </div>
+            <div className="min-h-[50vh] flex flex-col items-center justify-center animate-fade-in py-12">
+               <div className="relative px-4 w-full flex justify-center">
+                 {/* Pulsing circles behind */}
+                 <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full animate-pulse max-w-md mx-auto"></div>
+                 
+                 <div className="relative bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 text-center max-w-xs w-full">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 relative rounded-full overflow-hidden shadow-lg ring-4 ring-slate-50 dark:ring-slate-800 bg-slate-100">
+                      <img 
+                         src={`https://flagcdn.com/w160/${selectedCountry?.code.toLowerCase()}.png`} 
+                         alt="Flag"
+                         className="w-full h-full object-cover"
+                       />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                      {t.loading}
+                    </h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-medium">
+                      {t.loadingDesc} {selectedCountry?.name}
+                    </p>
+                    <div className="flex justify-center">
+                      <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                    </div>
+                 </div>
+               </div>
             </div>
           )}
 
           {/* Error State */}
           {error && !isLoading && (
-            <div className="flex items-center justify-center min-h-[50vh] animate-fade-in">
-              <div className="max-w-md w-full text-center bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-red-100 dark:border-red-900/30">
-                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full w-fit mx-auto mb-6">
-                  <AlertTriangle className="h-10 w-10 text-red-500" />
+            <div className="flex items-center justify-center min-h-[40vh] animate-fade-in px-4">
+              <div className="max-w-md w-full text-center bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-xl border border-red-100 dark:border-red-900/30">
+                <div className="bg-red-50 dark:bg-red-900/20 h-14 w-14 sm:h-16 sm:w-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 dark:text-red-400" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.errorTitle}</h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">{error}</p>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-3">{t.errorTitle}</h3>
+                <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed text-sm sm:text-base">{error}</p>
                 <button 
                   onClick={() => selectedIncomeRange && handleIncomeSelect(selectedIncomeRange)}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-red-600/20 active:scale-95 w-full"
+                  className="w-full py-3.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all transform hover:scale-[1.02] shadow-lg shadow-red-600/20 flex items-center justify-center gap-2 text-sm sm:text-base"
                 >
-                  <RefreshCcw className="h-4 w-4" />
+                  <RefreshCcw className="h-5 w-5" />
                   {t.tryAgain}
                 </button>
               </div>
