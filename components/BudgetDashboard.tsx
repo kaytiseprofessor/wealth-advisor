@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BudgetPlan, Country } from '../types';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Lightbulb, TrendingUp, Quote, Trophy, Target } from 'lucide-react';
 import { TRANSLATIONS } from '../constants';
+
+// Lazy load the flag component
+const CountryFlag = React.lazy(() => import('./CountryFlag'));
 
 interface BudgetDashboardProps {
   plan: BudgetPlan;
@@ -52,11 +55,13 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ plan, country,
 
           <div className="hidden md:block">
              <div className="w-24 h-24 bg-white/10 dark:bg-slate-100 backdrop-blur-sm rounded-2xl p-2 shadow-inner rotate-3">
-               <img 
-                  src={`https://flagcdn.com/w160/${country.code.toLowerCase()}.png`} 
-                  alt={country.name}
-                  className="w-full h-full object-cover rounded-xl shadow-sm"
-                />
+               <Suspense fallback={<div className="w-full h-full bg-white/10 dark:bg-slate-200 animate-pulse rounded-xl" />}>
+                 <CountryFlag 
+                    code={country.code} 
+                    name={country.name}
+                    className="w-full h-full object-cover rounded-xl shadow-sm"
+                  />
+               </Suspense>
              </div>
           </div>
         </div>

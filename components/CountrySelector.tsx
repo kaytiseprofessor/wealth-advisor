@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, Suspense } from 'react';
 import { COUNTRIES, TRANSLATIONS } from '../constants';
 import { Country } from '../types';
 import { Search, Globe } from 'lucide-react';
+
+// Lazy load the flag component
+const CountryFlag = React.lazy(() => import('./CountryFlag'));
 
 interface CountrySelectorProps {
   onSelect: (country: Country) => void;
@@ -92,7 +95,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({ onSelect, lang
                   : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}
               `}
             >
-              {region === 'All' ? t.regions?.All || 'All' : t.regions[region] || region}
+              {region === 'All' ? (t.regions?.All || 'All') : (t.regions[region] || region)}
             </button>
           ))}
         </div>
@@ -128,13 +131,13 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({ onSelect, lang
               "
             >
               <div className="relative w-16 h-16 mb-4 rounded-full overflow-hidden shadow-md border-2 border-slate-50 dark:border-slate-800 group-hover:scale-110 transition-transform duration-300">
-                  <img 
-                  src={`https://flagcdn.com/w160/${country.code.toLowerCase()}.png`}
-                  srcSet={`https://flagcdn.com/w320/${country.code.toLowerCase()}.png 2x`}
-                  alt={`${country.name} flag`}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
+                <Suspense fallback={<div className="w-full h-full bg-slate-100 dark:bg-slate-800 animate-pulse" />}>
+                  <CountryFlag 
+                    code={country.code}
+                    name={country.name}
+                    className="h-full w-full object-cover"
+                  />
+                </Suspense>
               </div>
               
               <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base mb-1 line-clamp-1 w-full group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
